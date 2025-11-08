@@ -2,8 +2,8 @@
 import * as State from './state.js';
 
 // --- Private Module Variables ---
-let kick, hiHat, bass, melody;
-let kickSequence, hiHatSequence, bassSequence, melodySequence;
+let waltzBass, waltzChords, violinMelody, operaVoice;
+let bassSequence, chordSequence, violinSequence, operaSequence;
 let isMusicPlaying = false;
 let isAudioInitialized = false;
 let purchaseSound, cuteClickSound;
@@ -17,73 +17,103 @@ let purchaseSound, cuteClickSound;
 function initAudio() {
     if (isAudioInitialized) return;
 
-    Tone.Transport.bpm.value = 140;
-    Tone.Transport.swing = 0.2;
-    Tone.Transport.swingSubdivision = '8n';
-    const limiter = new Tone.Limiter(-6).toDestination();
+    // --- Setup Waltz Time ---
+    Tone.Transport.bpm.value = 120; // A classic waltz tempo
+    Tone.Transport.timeSignature = [3, 4]; // 3 beats per measure
+    const limiter = new Tone.Limiter(-12).toDestination();
 
-    kick = new Tone.MembraneSynth({
-        pitchDecay: 0.01,
-        octaves: 6,
+    // --- Instruments ---
+
+    // 1. "Oom" - The Bass on beat 1
+    waltzBass = new Tone.MonoSynth({
+        oscillator: { type: 'pulse', width: 0.6 },
+        envelope: { attack: 0.01, decay: 0.3, sustain: 0.1, release: 0.3 },
+        filter: { Q: 2, type: 'lowpass', cutoff: 400 }
+    }).connect(limiter);
+
+    // 2. "Pah-Pah" - Accordion/Strings on beats 2 & 3
+    waltzChords = new Tone.PolySynth(Tone.AMSynth, {
+        harmonicity: 1.5,
+        envelope: { attack: 0.05, decay: 0.2, sustain: 0, release: 0.1 },
+        modulation: { type: 'square' },
+        modulationEnvelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
+    }).connect(limiter);
+    waltzChords.volume.value = -8;
+
+    // 3. "Violin" - Prominent Melody
+    const violinVibrato = new Tone.LFO("6hz", -5, 5).start(); // 6Hz vibrato
+    violinMelody = new Tone.MonoSynth({
+        oscillator: { type: 'sawtooth' }, // Sawtooth is good for strings
+        filter: { Q: 1, type: 'lowpass', cutoff: 3000 },
+        envelope: { attack: 0.1, decay: 0.3, sustain: 0.2, release: 0.8 }
+    }).connect(limiter);
+    violinVibrato.connect(violinMelody.filter.frequency); // Vibrato affects the filter
+    violinMelody.volume.value = -4;
+
+    // 4. "Mock Opera Voice" - Soaring counter-melody
+    const operaVibrato = new Tone.LFO("5hz", 8, 12).start(); // Faster, wider vibrato
+    operaVoice = new Tone.MonoSynth({
+        portamento: 0.1, // Glide between notes
         oscillator: { type: 'sine' },
-        envelope: { attack: 0.001, decay: 0.3, sustain: 0.01, release: 0.2 }
+        filter: { Q: 5, type: 'bandpass', cutoff: 2000, gain: 10 },
+        envelope: { attack: 0.2, decay: 0.2, sustain: 0.3, release: 0.5 }
     }).connect(limiter);
-    
-    const kickPattern = ['C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'GC5', null];
-    
-    kickSequence = new Tone.Sequence((time, note) => {
-        if (note) kick.triggerAttackRelease(note, '8n', time);
-    }, kickPattern, '8n');
-    kickSequence.loop = true;
+    operaVibrato.connect(operaVoice.detune); // Vibrato affects the pitch
+    operaVoice.volume.value = -6;
 
-    hiHat = new Tone.NoiseSynth({
-        noise: { type: 'white' },
-        envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 }
-    }).connect(limiter);
 
-    const hiHatPattern = [null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'GTesting', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'GC5', null];
+    // --- Sequences (The Music) ---
 
-    hiHatSequence = new Tone.Sequence((time, note) => {
-        if (note) hiHat.triggerAttackRelease('8n', time);
-    }, hiHatPattern, '8n');
-    hiHatSequence.loop = true;
+    // Measures are 3 beats long. "4n" = quarter note. "2m" = 2 measures.
+    // A classic I-V-IV-I progression (G - D - C - G)
 
-    bass = new Tone.MonoSynth({
-        oscillator: { type: 'sawtooth' },
-        filter: { Q: 2, type: 'lowpass', cutoff: 400 },
-        envelope: { attack: 0.01, decay: 0.2, sustain: 0.3, release: 0.5 }
-    }).connect(limiter);
-
-    const bassPattern = [
-        'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null,
-        'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null,
-        'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null,
-        'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null,
-        'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null,
-        'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null,
-        'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null,
-        'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null
-    ];
-
+    // Bass ("Oom")
     bassSequence = new Tone.Sequence((time, note) => {
-        if (note) bass.triggerAttackRelease(note, '8n', time);
-    }, bassPattern, '8n');
-    bassSequence.loop = true;
+        waltzBass.triggerAttackRelease(note, '4n', time);
+    }, ['G2', null, null, 'D2', null, null, 'C2', null, null, 'G2', null, null], '4n');
 
-    melody = new Tone.FMSynth({
-        harmonicity: 3,
-        modulationIndex: 10,
-        oscillator: { type: 'sine' },
-        envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.5 }
-    }).connect(limiter);
+    // Chords ("Pah-Pah")
+    chordSequence = new Tone.Sequence((time, chord) => {
+        waltzChords.triggerAttackRelease(chord, '8n', time);
+    }, [
+        null, ['B3', 'D4'], ['B3', 'D4'], // G Major
+        null, ['A3', 'C#4'], ['A3', 'C#4'], // D Major
+        null, ['C4', 'E4'], ['C4', 'E4'], // C Major
+        null, ['B3', 'D4'], ['B3', 'D4']  // G Major
+    ], '4n');
 
-    const melodyPattern = ['G4', 'A#4', 'C5', null, 'G4', 'D#4', null, null, 'G4', 'A#4', 'C5', null, 'D#5', 'C5', 'A#4', null, 'G4', 'A#4', 'C5', null, 'G4', 'D#4', null, null, 'G4', 'A#4', 'G4', 'D#4', 'C4', null, null, null, 'G#4', 'C5', 'D#5', null, 'C5', 'G#4', null, null, 'G#4', 'C5', 'D#5', null, 'F5', 'D#5', 'C5', null, 'G#4', 'C5', 'D#5', null, 'C5', 'G#4', null, null, 'C5', 'A#4', 'G#4', 'F4', 'D#4', null, null, null, 'F4', 'G#4', 'C5', null, 'G#4', 'F4', null, null, 'F4', 'G#4', 'C5', null, 'D#5', 'C5', 'G#4', null, 'F4', 'G#4', 'C5', null, 'G#4', 'F4', null, null, 'F4', 'G#4', 'F4', 'D#4', 'C4', null, null, null, 'G4', 'B4', 'D5', null, 'D5', 'B4', 'G4', null, 'G4', 'B4', 'D5', 'F5', 'D5', 'B4', 'G4', null, 'A#4', null, 'B4', null, 'C5', null, 'B4', 'A#4', 'G4', 'F4', 'D#4', 'D4', 'C4', null, null, null];
-    
-    melodySequence = new Tone.Sequence((time, note) => {
-        if (note) melody.triggerAttackRelease(note, '8n', time);
-    }, melodyPattern, '8n');
-    melodySequence.loop = true;
+    // Violin Melody
+    violinSequence = new Tone.Sequence((time, note) => {
+        violinMelody.triggerAttackRelease(note, '4n', time);
+    }, [
+        'G4', 'B4', 'D5',
+        'C5', 'B4', 'A4',
+        'A4', 'G4', 'F#4',
+        'G4', null, null,
+        'G4', 'B4', 'D5',
+        'C5', 'B4', 'A4',
+        'B4', 'C5', 'A4',
+        'G4', null, null
+    ], '4n');
 
+    // Opera Voice (comes in on the 2nd half)
+    operaSequence = new Tone.Sequence((time, note) => {
+        operaVoice.triggerAttackRelease(note, '2n', time); // Long, soaring notes
+    }, [
+        null, null, null, null, null, null, null, null, null, null, null, null, // Rest for 4 measures
+        'D5', null, null, // "O..."
+        'E5', null, null, // "...so..."
+        'C5', null, null, // "...le..."
+        'B4', null, null, // "...mi..."
+        'D5', null, null, null, null, null, // "O..."
+        'C5', null, null, // "...pi..."
+        'B4', null, null, // "...zza..."
+        'A4', null, null, // "...pi..."
+        'G4', null, null  // "...zza!"
+    ], '4n');
+
+
+    // --- Sound Effects (Unchanged, but useful) ---
     cuteClickSound = new Tone.FMSynth({
         oscillator: { type: 'sine' },
         envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.1 },
@@ -103,7 +133,7 @@ function initAudio() {
 
 /**
  * Plays a sound effect if SFX are not muted.
- * @param {string} sound - The name of the sound to play ('crunch' or 'purchase').
+ * @param {string} sound - The name of the sound to play ('click' or 'purchase').
  */
 export function playSoundEffect(sound) {
     if (State.uiState.isSfxMuted) return;
@@ -119,7 +149,7 @@ export function playSoundEffect(sound) {
     const now = Tone.now(); 
     const offset = 0.001;
 
-    if (sound === 'crunch') {
+    if (sound === 'click') { // Renamed from 'crunch'
         cuteClickSound.triggerAttackRelease('C6', '32n', now + offset);
     }
     if (sound === 'purchase') {
@@ -137,7 +167,7 @@ export function toggleSfx(dom) {
     State.uiState.isSfxMuted = !State.uiState.isSfxMuted;
     dom.sfxToggleButton.textContent = State.uiState.isSfxMuted ? '🔇' : '🔊';
     if (!State.uiState.isSfxMuted) {
-        playSoundEffect('crunch');
+        playSoundEffect('click'); // Renamed from 'crunch'
     }
 }
 
@@ -157,12 +187,18 @@ export function toggleMusic(dom) {
     if (isMusicPlaying) {
         Tone.Transport.stop();
         dom.musicToggleButton.textContent = '🔇';
+        // Stop all sequences
+        if (bassSequence) bassSequence.stop(0);
+        if (chordSequence) chordSequence.stop(0);
+        if (violinSequence) violinSequence.stop(0);
+        if (operaSequence) operaSequence.stop(0);
     } else {
         Tone.Transport.start();
-        if (kickSequence && kickSequence.state === 'stopped') kickSequence.start(0);
-        if (hiHatSequence && hiHatSequence.state === 'stopped') hiHatSequence.start(0);
+        // Start all sequences
         if (bassSequence && bassSequence.state === 'stopped') bassSequence.start(0);
-        if (melodySequence && melodySequence.state === 'stopped') melodySequence.start(0);
+        if (chordSequence && chordSequence.state === 'stopped') chordSequence.start(0);
+        if (violinSequence && violinSequence.state === 'stopped') violinSequence.start(0);
+        if (operaSequence && operaSequence.state === 'stopped') operaSequence.start(0);
         dom.musicToggleButton.textContent = '🎵';
     }
     isMusicPlaying = !isMusicPlaying;
