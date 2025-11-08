@@ -2,18 +2,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
 
+/* --- LIGHT MODE (Pizza Parlor) --- */
 body {
     font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior: none;
-    background-color: #FFC0CB;
-    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.7'%3E%3Crect x='10' y='10' width='3' height='10' fill='%23FFD700' transform='rotate(25 11.5 15)' /%3E%3Crect x='60' y='30' width='3' height='10' fill='%23FF69B4' transform='rotate(140 61.5 35)' /%3Crect x='30' y='70' width='3' height='10' fill='%2390EE90' transform='rotate(70 31.5 75)' /%3E%3Crect x='80' y='85' width='3' height='10' fill='%2387CEEB' transform='rotate(210 81.5 90)' /%E3%80%89%3Crect x='5' y='45' width='3' height='10' fill='%23FFD700' transform='rotate(100 6.5 50)' /%3E%3Crect x='90' y='5' width='3' height='10' fill='%23FF69B4' transform='rotate(300 91.5 10)' /%3E%3C/g%3E%3C/svg%3E"), 
-                    linear-gradient(135deg, #FFC0CB 0%, #FFDDE1 100%);
-    background-size: 200px 200px, cover;
-    background-blend-mode: overlay, normal;
+    /* Parchment/white background */
+    background-color: #F9F7F3;
+    background-image: linear-gradient(135deg, #F9F7F3 0%, #FFFFFF 100%);
+    background-size: cover;
     background-attachment: fixed;
-    color: #333333;
+    color: #222222; /* Darker main text */
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -21,22 +21,25 @@ body {
     margin: 0;
 }
 
-.bg-tamagotchi-bg-light { background-color: #FFFACD; } 
-.text-tamagotchi-dark { color: #333333; }
-.text-tamagotchi-pink-dark { color: #E75480; }
-.text-tamagotchi-pink-light { color: #FF9AA2; }
+.bg-tamagotchi-bg-light { background-color: #F9F7F3; } 
+.text-tamagotchi-dark { color: #222222; }
+.text-tamagotchi-pink-dark { color: #D93025; } /* Tomato Red */
+.text-tamagotchi-pink-light { color: #F95045; }
 
+/* SLIME BUTTON */
 .bg-tamagotchi-button-pink { 
-    background: linear-gradient(to bottom, #FFDDE1, #E75480);
-    color: white;
+    background: linear-gradient(to bottom, #9EFF00, #7FFF00);
+    color: #111111; /* Black text */
     font-weight: 800;
-    border: 2px solid #C04A70;
+    border: 2px solid #006400; /* Dark Green */
+    text-shadow: 0 1px 1px rgba(255,255,255,0.7);
 }
+/* TOMATO BUTTON */
 .bg-tamagotchi-button-teal { 
-    background: linear-gradient(to bottom, #B3F0E6, #66CCBF);
+    background: linear-gradient(to bottom, #F95045, #D93025);
     color: white;
     font-weight: 800;
-    border: 2px solid #50A89C;
+    border: 2px solid #A01005;
 }
 .bg-tamagotchi-button-pink:active, .bg-tamagotchi-button-teal:active {
     transform: translateY(1px);
@@ -45,16 +48,20 @@ body {
 
 .border-tamagotchi-subtle { border-color: #E0E0E0; }
 .bg-tamagotchi-card { 
-    background-color: #FFFACD;
-    border: 2px solid #E0E0E0;
+    background-color: #FFFFFF; /* Clean white cards */
+    border: 2px solid #F5DEB3; /* Pizza crust border */
 }
-.border-tamagotchi-accent-pink { border-color: #FF9AA2; }
+.border-tamagotchi-accent-pink { border-color: #F95045; }
 
-.rounded-tamagotchi-lg { border-radius: 20px; }
-.rounded-tamagotchi-md { border-radius: 14px; }
+/* Rounded corners */
+.rounded-tamagotchi-lg { border-radius: 12px; }
+.rounded-tamagotchi-md { border-radius: 8px; }
 .rounded-tamagotchi-full { border-radius: 9999px; }
 
-.shadow-tamagotchi { box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1); }
+/* SLIME SHADOW */
+.shadow-tamagotchi { 
+    box-shadow: 0 2px 4px rgba(127, 255, 0, 0.4), 0 4px 8px rgba(127, 255, 0, 0.3);
+}
 
 .nav-icon span {
     font-size: 32px;
@@ -62,7 +69,7 @@ body {
     transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 .nav-icon.active span {
-    color: #E75480;
+    color: #D93025; /* Red */
     transform: scale(1.1);
 }
 
@@ -94,7 +101,8 @@ body {
     cursor: pointer;
     border: 2px solid #E0E0E0;
     background-color: #f0f0f0;
-    box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+    /* Slime glow on buttons */
+    box-shadow: 0px 2px 5px rgba(127, 255, 0, 0.3);
     transition: transform 0.1s ease-in-out, background-color 0.2s;
     z-index: 30;
 }
@@ -112,7 +120,7 @@ body {
     right: 88px;
 }
 
-/* NEW: Toggle button positioning */
+/* View toggle (now slime) */
 #view-toggle-button {
     position: absolute;
     top: 10px;
@@ -125,10 +133,10 @@ body {
     font-size: 20px;
     border-radius: 50%;
     cursor: pointer;
-    border: 2px solid #C04A70;
-    background: linear-gradient(to bottom, #FFDDE1, #E75480);
-    color: white;
-    box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+    border: 2px solid #006400;
+    background: linear-gradient(to bottom, #9EFF00, #7FFF00);
+    color: #111111;
+    box-shadow: 0px 4px 8px rgba(127, 255, 0, 0.5);
     transition: transform 0.1s ease-in-out, opacity 0.2s;
     z-index: 30;
     font-weight: bold;
@@ -137,18 +145,20 @@ body {
     transform: translateY(1px);
     box-shadow: none;
 }
-/* Style for the two containers below the donut */
+
 .glaze-blaze-container {
-    min-height: 100px; /* Adjust based on content height to prevent jump */
+    min-height: 100px; 
     transition: opacity 0.3s ease;
 }
 
+/* Canvas background */
 .glitch-static {
     position: relative;
     overflow: hidden;
-    background-color: #FFFACD !important;
+    background-color: #F9F7F3 !important; /* Parchment */
 }
 
+/* Static effect (now very subtle) */
 .glitch-static::before {
     content: '';
     position: absolute;
@@ -157,15 +167,14 @@ body {
     width: 100%;
     height: 100%;
     background: 
-        linear-gradient(rgba(240, 230, 200, 0.4) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(240, 230, 200, 0.4) 1px, transparent 1px);
+        linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
     background-size: 4px 4px;
     animation: static-flicker 0.5s infinite alternate, static-move 3s steps(10) infinite;
     opacity: 0.6;
     pointer-events: none;
     z-index: 15;
 }
-
 .glitch-static::after {
     content: '';
     position: absolute;
@@ -176,7 +185,7 @@ body {
     background: linear-gradient(
         to bottom,
         transparent 0%,
-        rgba(240, 230, 200, 0.2) 50%,
+        rgba(0, 0, 0, 0.05) 50%,
         transparent 100%
     );
     mix-blend-mode: overlay;
@@ -191,17 +200,16 @@ body {
     50% { background-position: 8px 8px; opacity: 0.5; }
     100% { background-position: 0 0; opacity: 0.7; }
 }
-
 @keyframes static-move {
     0% { transform: translate(0, 0); }
     100% { transform: translate(0, 100%); }
 }
-
 @keyframes scanline {
     0% { background-position: 0 0; }
     100% { transform: translate(0, 100%); }
 }
 
+/* Falling Spices (was snow) */
 .falling-snow {
     position: absolute;
     top: 0;
@@ -212,7 +220,6 @@ body {
     z-index: 17;
     overflow: hidden;
 }
-
 .falling-snow::before,
 .falling-snow::after {
     content: '';
@@ -221,24 +228,24 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
+    /* Red and Green flakes */
     background-image: 
-        radial-gradient(circle at 10% 20%, #A0A0A0 1px, transparent 1px),
-        radial-gradient(circle at 70% 80%, #C0C0C0 1px, transparent 1px),
-        radial-gradient(circle at 30% 60%, #B0B0B0 1px, transparent 1px),
-        radial-gradient(circle at 90% 10%, #E0E0E0 1px, transparent 1px),
-        radial-gradient(circle at 50% 40%, #D0D0D0 1px, transparent 1px),
-        radial-gradient(circle at 20% 90%, #F0F0F0 1px, transparent 1px),
-        radial-gradient(circle at 80% 30%, #A0A0A0 1px, transparent 1px),
-        radial-gradient(circle at 40% 70%, #C0C0C0 1px, transparent 1px),
-        radial-gradient(circle at 60% 5%, #B0B0B0 1px, transparent 1px),
-        radial-gradient(circle at 5% 50%, #E0E0E0 1px, transparent 1px),
-        radial-gradient(circle at 95% 45%, #D0D0D0 1px, transparent 1px);
+        radial-gradient(circle at 10% 20%, #D93025 1px, transparent 1px),
+        radial-gradient(circle at 70% 80%, #006400 1px, transparent 1px),
+        radial-gradient(circle at 30% 60%, #D93025 1px, transparent 1px),
+        radial-gradient(circle at 90% 10%, #006400 1px, transparent 1px),
+        radial-gradient(circle at 50% 40%, #D93025 1px, transparent 1px),
+        radial-gradient(circle at 20% 90%, #006400 1px, transparent 1px),
+        radial-gradient(circle at 80% 30%, #D93025 1px, transparent 1px),
+        radial-gradient(circle at 40% 70%, #006400 1px, transparent 1px),
+        radial-gradient(circle at 60% 5%, #D93025 1px, transparent 1px),
+        radial-gradient(circle at 5% 50%, #006400 1px, transparent 1px),
+        radial-gradient(circle at 95% 45%, #D93025 1px, transparent 1px);
     background-repeat: repeat;
     background-size: 20px 20px;
     animation: snowfall 10s linear infinite;
     opacity: 0.7;
 }
-
 .falling-snow::after {
     animation-delay: 5s;
     background-size: 25px 25px;
@@ -251,111 +258,112 @@ body {
     100% { transform: translateY(100%); }
 }
 
+/* Ticker */
 .ticker-wrap {
     width: 100%;
     overflow: hidden;
-    background-color: #333;
+    background-color: #006400; /* Dark Basil Green */
     padding: 4px 0;
-    border-top: 2px solid #555;
-    border-bottom: 2px solid #555;
+    border-top: 2px solid #004000;
+    border-bottom: 2px solid #004000;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
 }
-
 #top-ticker { margin-bottom: 8px; }
 #bottom-ticker { margin-top: 8px; }
 
-.ticker-move {
+.ticker-move, .ticker-move-reverse {
     display: inline-block;
     white-space: nowrap;
     animation: scroll-ticker 20s linear infinite;
-    color: #FFFACD;
+    color: #FFFFFF; /* White text */
     font-size: 14px;
     font-weight: bold;
     font-family: 'Comic Neue', cursive;
     text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
 }
-
 .ticker-move-reverse {
-    display: inline-block;
-    white-space: nowrap;
     animation: scroll-ticker-reverse 20s linear infinite;
-    color: #FFFACD;
-    font-size: 14px;
-    font-weight: bold;
-    font-family: 'Comic Neue', cursive;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
 }
 
 @keyframes scroll-ticker {
     0% { transform: translateX(0%); }
     100% { transform: translateX(-50%); }
 }
-
 @keyframes scroll-ticker-reverse {
     0% { transform: translateX(-50%); }
     100% { transform: translateX(0%); }
 }
 
+
+/* --- DARK MODE (Slime Theme) --- */
 body.dark {
-    background-color: #5C3317;
-    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%236B4A34' fill-opacity='0.4'%3E%3Cpath d='M10 0L0 10l10 10 10-10z'/%3E%3Cpath d='M0 10L10 20l10-10L10 0z'/%3E%3C/g%3E%3C/svg%3E"), 
-                    linear-gradient(135deg, #5C3317 0%, #3D2B1F 100%);
+    background-color: #111111; /* Dark charcoal */
+    background-image: linear-gradient(135deg, #222222 0%, #111111 100%);
 }
 
+/* SLIME BORDERS */
 body.dark .bg-tamagotchi-card {
-    background-color: #3D2B1F;
-    border-color: #4A3A2A;
+    background-color: #1A1A1A;
+    border: 2px solid #7FFF00; /* Neon Slime Border */
 }
 
-body.dark .text-tamagotchi-dark { color: #F5E6C1; }
-body.dark .text-gray-500 { color: #A8998A; }
-body.dark .text-gray-600 { color: #B8A99A; }
+body.dark .text-tamagotchi-dark { color: #F5E6C1; } /* Off-white text */
+body.dark .text-gray-500 { color: #888888; }
+body.dark .text-gray-600 { color: #999999; }
 
-body.dark .text-tamagotchi-pink-dark { color: #FF9AA2; }
+/* Accent text is Slime */
+body.dark .text-tamagotchi-pink-dark { color: #7FFF00; }
 
 body.dark .glitch-static {
-    background-color: #3D2B1F !important;
+    background-color: #1A1A1A !important;
 }
+/* Slime static */
 body.dark .glitch-static::before {
     background: 
-        linear-gradient(rgba(150, 130, 110, 0.4) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(150, 130, 110, 0.4) 1px, transparent 1px);
+        linear-gradient(rgba(127, 255, 0, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(127, 255, 0, 0.1) 1px, transparent 1px);
 }
 body.dark .glitch-static::after {
     background: linear-gradient(
         to bottom,
         transparent 0%,
-        rgba(150, 130, 110, 0.2) 50%,
+        rgba(127, 255, 0, 0.05) 50%,
         transparent 100%
     );
 }
 
 body.dark .falling-snow::before {
-    opacity: 0.4;
+    opacity: 0.5;
 }
 body.dark .falling-snow::after {
-    opacity: 0.3;
+    opacity: 0.4;
 }
 
-body.dark .border-tamagotchi-subtle { border-color: #4A3A2A; }
+body.dark .border-tamagotchi-subtle { border-color: #444444; }
 
 body.dark .nav-icon span {
-    color: #A8998A;
+    color: #888888;
 }
 body.dark .nav-icon.active span {
-    color: #FF9AA2;
+    color: #7FFF00; /* Slime */
 }
 
 body.dark .color-cycle-button {
-    background-color: #3D2B1F;
-    border-color: #4A3A2A;
-    color: #F5E6C1;
+    background-color: #1A1A1A;
+    border-color: #7FFF00;
+    color: #7FFF00;
 }
 
 body.dark .bg-tamagotchi-bg-light {
-    background-color: #3D2B1F;
+    background-color: #1A1A1A;
 }
 
+/* SLIME SHADOW (Dark) */
+body.dark .shadow-tamagotchi {
+    box-shadow: 0 2px 5px rgba(127, 255, 0, 0.6), 0 4px 10px rgba(127, 255, 0, 0.5);
+}
+
+/* Slime Zoom Slider */
 .zoom-slider {
     position: absolute;
     top: 50%;
@@ -374,7 +382,7 @@ body.dark .bg-tamagotchi-bg-light {
     transition: background 0.2s;
 }
 body.dark .zoom-slider {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(127, 255, 0, 0.2);
 }
 
 .zoom-slider::-webkit-slider-thumb {
@@ -382,29 +390,29 @@ body.dark .zoom-slider {
     appearance: none;
     width: 22px;
     height: 22px;
-    background: #FFFACD;
+    background: #FFFFFF;
     border-radius: 50%;
-    border: 2px solid #E75480;
+    border: 2px solid #D93025; /* Red */
     cursor: grab;
 }
 .zoom-slider::-moz-range-thumb {
     width: 22px;
     height: 22px;
-    background: #FFFACD;
+    background: #FFFFFF;
     border-radius: 50%;
-    border: 2px solid #E75480;
+    border: 2px solid #D93025; /* Red */
     cursor: grab;
 }
 body.dark .zoom-slider::-webkit-slider-thumb {
-    background: #3D2B1F;
-    border-color: #FF9AA2;
+    background: #1A1A1A;
+    border-color: #7FFF00; /* Slime */
 }
 body.dark .zoom-slider::-moz-range-thumb {
-    background: #3D2B1F;
-    border-color: #FF9AA2;
+    background: #1A1A1A;
+    border-color: #7FFF00; /* Slime */
 }
 
-/* NEW: Filter classes for the canvas container */
+/* Filter classes for the canvas container */
 .blaze-active {
     filter: contrast(1.2) brightness(0.9);
     transition: filter 0.5s ease-in-out;
