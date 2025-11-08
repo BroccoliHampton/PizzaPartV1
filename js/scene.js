@@ -2,6 +2,7 @@
 
 // --- Private Module Variables ---
 let scene, camera, renderer, donutGroup, glazeMaterial, donutMaterial, sprinkleMeshes = [];
+let pepperoniMaterial; // For the pepperoni
 let isDragging = false;
 let previousPointerX = 0;
 let previousPointerY = 0;
@@ -47,26 +48,33 @@ const NegativeShader = {
 const MIN_ZOOM_Z = 3;
 const MAX_ZOOM_Z = 20;
 
-const glazeColors = [
-    0xFFC0CB, 0xADD8E6, 0x90EE90, 0xFFD700,
-    0x800080, 0xFFF8DC, 0xFF0000, 0x000000
+const glazeColors = [ // Cheese colors
+    0xFFD700, // Yellow
+    0xFFA500, // Orange
+    0xFFF8DC, // Pale
+    0xFFE4B5  // Moccasin
 ];
 let currentGlazeColorIndex = 0;
 
-const donutBaseColors = [
-    0x5C3317, 0xDEB887, 0x3D2B1F, 0xF5DEB3, 0xFFC0CB, null
+const donutBaseColors = [ // Crust colors
+    0x5C3317, // Dark
+    0xDEB887, // Standard
+    0x3D2B1F, // Darker
+    0xF5DEB3, // Light
+    0x8B4513, // Saddle Brown
+    null // Wireframe
 ];
 let currentDonutBaseColorIndex = 0;
 
-const sprinkleColorSets = [
-    [0xFF0000, 0xFF7F00, 0xFFFF00, 0x00FF00, 0x0000FF, 0x4B0082, 0x9400D3],
-    [0xFFFFFF, 0xF0F0F0, 0xE0E0E0],
-    [0x000000, 0x333333, 0x666666],
-    [0xFFC0CB, 0xFF9AA2, 0xFFDDE1],
-    [0x87CEEB, 0xADD8E6, 0xB0E0E6],
-    [0xDAA520, 0xB8860B, 0xFFD700]
+// Replaced sprinkle colors with pepperoni/topping colors
+const pepperoniColors = [
+    0xBC4A3C, // Red
+    0x8B0000, // Darker Red
+    0xCCCCCC, // Mushroom
+    0x006400  // Green Pepper
 ];
-let currentSprinkleColorSetIndex = 0;
+let currentPepperoniColorIndex = 0;
+
 
 // --- Private Functions ---
 
@@ -123,41 +131,36 @@ function createSpeckleTexture(size = 512) {
     return new THREE.CanvasTexture(canvas);
 }
 
+// This function now creates pepperonis
 function createSprinkles() {
     sprinkleMeshes.forEach(sprinkle => donutGroup.remove(sprinkle));
     sprinkleMeshes = [];
 
-    const currentColors = sprinkleColorSets[currentSprinkleColorSetIndex];
+    const pepperoniGeometry = new THREE.CylinderGeometry(0.25, 0.25, 0.05, 16);
+    pepperoniMaterial = new THREE.MeshStandardMaterial({ 
+        color: pepperoniColors[currentPepperoniColorIndex] 
+    });
 
-    const sprinkleShape = new THREE.CylinderGeometry(0.06, 0.06, 0.4, 8); 
-    const numSprinkles = 800; 
-    const R_sprinkle = 2.8; 
-    const r_sprinkle = 1.3 * 0.9; 
+    const positions = [
+        [1.5, 0.5],
+        [1.8, -0.2],
+        [2.5, 0.8],
+        [2.2, -0.9],
+        [2.8, 0]
+    ];
 
-    for (let i = 0; i < numSprinkles; i++) {
-        const color = currentColors[Math.floor(Math.random() * currentColors.length)];
-        const sprinkleMaterial = new THREE.MeshStandardMaterial({ color: color });
-        const sprinkle = new THREE.Mesh(sprinkleShape, sprinkleMaterial);
-        const u = Math.random() * 2 * Math.PI; 
-        const v = Math.random() * 2 * Math.PI; 
-        
-        sprinkle.position.x = (R_sprinkle + r_sprinkle * Math.cos(u)) * Math.cos(v);
-        sprinkle.position.y = (R_sprinkle + r_sprinkle * Math.cos(u)) * Math.sin(v);
-        sprinkle.position.z = r_sprinkle * Math.sin(u);
-
-        if (sprinkle.position.z < -0.2 * 1.3) { 
-            continue; 
+    positions.forEach(pos => {
+        // Simple check to place pepperoni within the slice bounds
+        const angle = Math.atan2(pos[1], pos[0]);
+        const distance = Math.sqrt(pos[0] * pos[0] + pos[1] * pos[1]);
+        if (distance < 3.2 && angle > -Math.PI / 7 && angle < Math.PI / 7) {
+            const pepperoni = new THREE.Mesh(pepperoniGeometry, pepperoniMaterial);
+            // Position on top of the slice (0.2 is slice depth)
+            pepperoni.position.set(pos[0], pos[1], 0.2 + 0.025); 
+            donutGroup.add(pepperoni);
+            sprinkleMeshes.push(pepperoni);
         }
-
-        const centerOfTubeCrossSection = new THREE.Vector3(R_sprinkle * Math.cos(v), R_sprinkle * Math.sin(v), 0);
-        const normal = new THREE.Vector3().subVectors(sprinkle.position, centerOfTubeCrossSection).normalize();
-        sprinkle.position.addScaledVector(normal, 0.12); 
-        sprinkle.lookAt(new THREE.Vector3().addVectors(sprinkle.position, normal));
-        sprinkle.rotateX(Math.PI / 2); 
-        sprinkle.rotation.z += Math.random() * Math.PI; 
-        donutGroup.add(sprinkle);
-        sprinkleMeshes.push(sprinkle);
-    }
+    });
 }
 
 function onResize(dom) {
@@ -259,7 +262,7 @@ function onMouseWheel(e) {
 // --- Exported Functions ---
 
 /**
- * Initializes the Three.js scene, camera, renderer, and donut.
+ * Initializes the Three.js scene, camera, renderer, and pizza.
  * @param {object} dom - The cached DOM elements object.
  */
 export function initThreeJS(dom) {
@@ -298,8 +301,55 @@ export function initThreeJS(dom) {
 
     donutGroup = new THREE.Group();
     
-    const donutGeometry = new THREE.TorusGeometry(2.8, 1.3, 32, 100);
+    // --- Pizza Slice Base (Cheese/Sauce) ---
+    const pizzaShape = new THREE.Shape();
+    const radius = 3.5;
+    const startAngle = -Math.PI / 7; // A reasonable slice angle
+    const endAngle = Math.PI / 7;
 
+    // Start at the point
+    pizzaShape.moveTo(0, 0);
+    // Arc for the crust edge
+    pizzaShape.absarc(0, 0, radius, startAngle, endAngle, false);
+    // Line back to the point
+    pizzaShape.lineTo(0, 0);
+
+    const extrudeSettings = {
+        steps: 1,
+        depth: 0.2, // Thickness of the slice
+        bevelEnabled: true,
+        bevelThickness: 0.05,
+        bevelSize: 0.05,
+        bevelOffset: 0,
+        bevelSegments: 1
+    };
+
+    const pizzaGeometry = new THREE.ExtrudeGeometry(pizzaShape, extrudeSettings);
+
+    // This material was the 'glaze' material. Let's use it for the cheese.
+    glazeMaterial = new THREE.MeshStandardMaterial({
+        color: glazeColors[currentGlazeColorIndex],
+        roughness: 0.7,
+        metalness: 0.1,
+    });
+    const pizzaBase = new THREE.Mesh(pizzaGeometry, glazeMaterial);
+    donutGroup.add(pizzaBase);
+
+
+    // --- Pizza Crust ---
+    const crustPath = new THREE.Path();
+    // This arc must match the pizzaShape's arc
+    crustPath.absarc(0, 0, radius, startAngle, endAngle, false);
+
+    const crustGeometry = new THREE.TubeGeometry(
+        crustPath,
+        20,    // path segments
+        0.3,   // radius of the tube
+        8,     // tube segments
+        false  // closed
+    );
+    
+    // This was the 'donut' material. Let's use it for the crust.
     const crackTexture = createCrackTexture(1024);
     crackTexture.wrapS = crackTexture.wrapT = THREE.RepeatWrapping;
     crackTexture.repeat.set(1, 1);
@@ -316,71 +366,12 @@ export function initThreeJS(dom) {
         bumpMap: crackTexture,
         bumpScale: 0.08
     });
-    const donutBase = new THREE.Mesh(donutGeometry, donutMaterial);
-    donutGroup.add(donutBase);
+    const pizzaCrust = new THREE.Mesh(crustGeometry, donutMaterial);
+    // Position the crust to sit on top of the slice edge
+    pizzaCrust.position.z = 0.2; // Lift it to be on top of the base
+    donutGroup.add(pizzaCrust);
 
-    const glazeRadius = 2.75; 
-    const glazeTubeRadius = 1.35; 
-    const radialSegments = 32; 
-    const tubularSegments = 100;
-
-    const glazeGeometry = new THREE.TorusGeometry(
-        glazeRadius,
-        glazeTubeRadius,
-        radialSegments,
-        tubularSegments
-    );
-    
-    const positionAttribute = glazeGeometry.attributes.position;
-    const tempVector = new THREE.Vector3();
-    const irregularityFactor = 0.15; 
-    const randomOffsets = new Array(tubularSegments).fill(0).map(() => Math.random() * irregularityFactor * 2 - irregularityFactor);
-
-    for (let i = 0; i < positionAttribute.count; i++) {
-        tempVector.fromBufferAttribute(positionAttribute, i);
-
-        const x = tempVector.x;
-        const y = tempVector.y;
-        const z = tempVector.z;
-        const r = Math.sqrt(x * x + y * y);
-        const angleAroundDonut = Math.atan2(y, x); 
-        const distFromGlazeMainRadius = Math.abs(r - glazeRadius);
-        const isOuterEdge = distFromGlazeMainRadius < (glazeTubeRadius * 0.4) && r > glazeRadius; 
-        const isBottomHalf = z < -0.4 * glazeTubeRadius; 
-        const isInnerEdge = distFromGlazeMainRadius < (glazeTubeRadius * 0.4) && r < glazeRadius;
-
-        if (isOuterEdge && isBottomHalf) {
-            const segmentIndex = Math.floor((angleAroundDonut / (2 * Math.PI)) * tubularSegments + tubularSegments) % tubularSegments;
-            const scallopMagnitude = 0.1 + (randomOffsets[segmentIndex] * 0.8 + 0.5) * 0.1; 
-            const currentRadius = Math.sqrt(tempVector.x * tempVector.x + tempVector.y * tempVector.y);
-            const normalizedX = tempVector.x / currentRadius;
-            const normalizedY = tempVector.y / currentRadius;
-
-            tempVector.x += normalizedX * scallopMagnitude;
-            tempVector.y += normalizedY * scallopMagnitude;
-            tempVector.z += scallopMagnitude * 0.5; 
-            positionAttribute.setXYZ(i, tempVector.x, tempVector.y, tempVector.z);
-        } else if (isInnerEdge) {
-            if (tempVector.z < -0.1) { 
-               tempVector.z = Math.min(tempVector.z + 0.1, 0); 
-            }
-            positionAttribute.setXYZ(i, tempVector.x, tempVector.y, tempVector.z);
-        }
-    }
-    glazeGeometry.attributes.position.needsUpdate = true;
-    glazeGeometry.computeVertexNormals(); 
-
-    glazeMaterial = new THREE.MeshStandardMaterial({
-        color: glazeColors[currentGlazeColorIndex],
-        roughness: 0.2,  
-        metalness: 0.1,  
-        transparent: true,
-        opacity: 0.85    
-    });
-    const glaze = new THREE.Mesh(glazeGeometry, glazeMaterial);
-    glaze.position.z = 0.05; 
-    donutGroup.add(glaze);
-
+    // This will now create pepperonis
     createSprinkles();
     
     scene.add(donutGroup);
@@ -433,13 +424,13 @@ export function animate() {
                 renderer.render(scene, camera);
             }
         } catch (e) {
-            console.error('[WASM Render Crash] Animation frame failed:', e.message);
+            console.error('[Render Error] Animation frame failed:', e.message);
         }
     }
 }
 
 /**
- * Changes the color of the donut's glaze.
+ * Changes the color of the pizza's cheese.
  */
 export function changeGlazeColor() {
     if (glazeMaterial) {
@@ -449,7 +440,7 @@ export function changeGlazeColor() {
 }
 
 /**
- * Changes the color/wireframe of the donut base.
+ * Changes the color/wireframe of the pizza crust.
  */
 export function changeDonutBaseColor() {
     if (donutMaterial) {
@@ -467,15 +458,17 @@ export function changeDonutBaseColor() {
 }
 
 /**
- * Re-generates the sprinkles with a new color set.
+ * Changes the color of the pepperoni/toppings.
  */
 export function changeSprinkleColor() {
-    currentSprinkleColorSetIndex = (currentSprinkleColorSetIndex + 1) % sprinkleColorSets.length;
-    createSprinkles();
+    if (pepperoniMaterial) {
+        currentPepperoniColorIndex = (currentPepperoniColorIndex + 1) % pepperoniColors.length;
+        pepperoniMaterial.color.set(pepperoniColors[currentPepperoniColorIndex]);
+    }
 }
 
 /**
- * Sets the spin speed of the donut.
+ * Sets the spin speed of the pizza.
  * @param {number} speed - The new spin speed.
  */
 export function setDonutSpinSpeed(speed) {
