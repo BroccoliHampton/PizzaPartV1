@@ -1,0 +1,34 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjEzNTAzMzgsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHg4ZGE5RTIxMzA3YzFFZEE1RjlEMDYxNGVCODM3RjNFRjhDRDVhNEI1In0",
+    "payload": "eyJkb21haW4iOiJkaWxsaW5nZXItZmluYWwudmVyY2VsLmFwcCJ9",
+    "signature": "MHgyZWRjMjZlYmE5MjZiNzFjYzhjMmIzZGY1MTUwNDE3OTJhNmI0ODQ2NjAzMzU3ZjBlNTczNjViMzBkMTZjZjRkMDc4MDU5NzA3MTQyZDRkNGVmNGIwMDg1OWFmN2I5YmI0NDMyMWQzMTljNDdmMTY4ZTIxN2MzOTY2NjVlOGJjMzFi"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Pinky Glazers Donut Miner",
+    "version": "1",
+    "iconUrl": "https://i.imgur.com/IHAbVrG.png",
+    "homeUrl": "https://donut-minerv2.vercel.app/",
+    "description": "Mine DONUT through the Pinky Glazers perpetual donut shop in this sweet miniapp",
+    "primaryCategory": "games",
+    "screenshotUrls": [
+      "https://i.imgur.com/IHAbVrG.png"
+    ],
+    "imageUrl": "https://i.imgur.com/IHAbVrG.png",
+    "heroImageUrl": "https://i.imgur.com/IHAbVrG.png",
+    "splashImageUrl": "https://i.imgur.com/IHAbVrG.png",
+    "splashBackgroundColor": "#000000",
+    "tags": [
+      "gaming",
+      "games",
+      "crypto",
+      "donut"
+    ],
+    "tagline": "Stay Glazin",
+    "buttonTitle": "Enter Shop",
+    "ogTitle": "Pinky Glazers",
+    "ogImageUrl": "https://i.imgur.com/IHAbVrG.png",
+    "subtitle": "Stay Glazin"
+  }
+}
